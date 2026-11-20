@@ -5,6 +5,33 @@ const getAllProperties = async (req, res) => {
     try {
         const { location, minCompletion, maxPrice } = req.query;
 
+        // Validate minimum completion percentage
+        if (minCompletion !== undefined) {
+            const completion = Number(minCompletion);
+
+            if (
+                !Number.isFinite(completion) ||
+                completion < 0 ||
+                completion > 100
+            ) {
+                return res.status(400).json({
+                    error: "Completion percentage must be a number between 0 and 100."
+                });
+            }
+        }
+
+        // Validate maximum property price
+        if (maxPrice !== undefined) {
+            const price = Number(maxPrice);
+
+            if (!Number.isFinite(price) || price < 0) {
+                return res.status(400).json({
+                    error: "Maximum price must be a valid positive number."
+                });
+            }
+        }
+
+        //Supabase query
         let query = supabase
             .from('properties')
             .select(`
@@ -14,22 +41,43 @@ const getAllProperties = async (req, res) => {
             .eq('status', 'available')
             .order('created_at', { ascending: false });
 
+        // Apply location filter
         if (location) {
             query = query.ilike('location', `%${location}%`);
         }
-        if (minCompletion) {
-            query = query.gte('completion_percentage', parseInt(minCompletion));
-        }
-        if (maxPrice) {
-            query = query.lte('price', parseFloat(maxPrice));
+
+        // Apply minimum completion filter
+        if (minCompletion !== undefined) {
+            query = query.gte(
+                'completion_percentage',
+                Number(minCompletion)
+            );
         }
 
+        // Apply maximum price filter
+        if (maxPrice !== undefined) {
+            query = query.lte(
+                'price',
+                Number(maxPrice)
+            );
+        }
+
+        // Execute query
         const { data, error } = await query;
+
         if (error) throw error;
 
-        res.status(200).json({ properties: data });
+        // Return properties
+        return res.status(200).json({
+            properties: data
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error fetching properties:', err);
+
+        return res.status(500).json({
+            error: 'An error occurred while retrieving properties.'
+        });
     }
 };
 
