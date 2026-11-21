@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HomeStretch | Find Your Future Home</title>
+  <meta name="description" content="Buy a near-completion home and choose your own finishes.">
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/catalog.css">
+  <script src="assets/js/catalog.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html" aria-label="HomeStretch home">
+        <span class="brand-mark">H</span>
+        <span class="brand-name">HomeStretch</span>
+      </a>
+      <nav class="nav-actions" aria-label="Main">
+        <a class="nav-link" href="login.html">Sign In</a>
+        <a class="btn btn-dark" href="login.html?role=developer">Post Property</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <h1 id="hero-title">Find Your Future Home</h1>
+
+        <form class="search-bar" id="hero-search" action="catalog.html" method="get">
+          <div class="search-field">
+            <label for="hero-location">Location</label>
+            <select id="hero-location" name="location"><option value="">All locations</option></select>
+          </div>
+          <div class="search-field">
+            <label for="hero-type">Property type</label>
+            <select id="hero-type" name="type"><option value="">All types</option></select>
+          </div>
+          <div class="search-field">
+            <label for="hero-status">Completion status</label>
+            <select id="hero-status" name="status"><option value="">Any status</option></select>
+          </div>
+          <button class="btn btn-dark" type="submit"><svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Search</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="why-title">
+      <div class="container center">
+        <h2 class="section-title" id="why-title">Why Choose Us</h2>
+        <p class="section-sub">Industry-leading standards for property investment</p>
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 2 3.1-.2.9 3 2.6 1.7-1.2 2.9 1.2 2.9-2.6 1.7-.9 3-3.1-.2L12 21l-2.4-2-3.1.2-.9-3-2.6-1.7L4.2 12 3 9.1l2.6-1.7.9-3 3.1.2z"/><path d="M8.5 12l2.4 2.4 4.6-4.8"/></svg></div>
+            <h3>Verified Listings</h3>
+            <p>Every property is vetted by our team of experts to ensure authenticity and legal compliance.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L16 8"/><path d="M14 6l4 4"/><path d="M19 3v3M17.5 4.5h3M6 4v2M5 5h2"/></svg></div>
+            <h3>Custom Finishes</h3>
+            <p>Select from premium materials and colors to tailor your future home to your exact preferences.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"/></svg></div>
+            <h3>Secure Payments</h3>
+            <p>Integrated escrow services and transparent payment timelines for absolute peace of mind.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section trending" aria-labelledby="trending-title">
+      <div class="container">
+        <div class="trending-head">
+          <div>
+            <h2 class="section-title" id="trending-title">Trending Near-Completion Projects</h2>
+            <p class="section-sub">Hand-picked properties entering final construction phases</p>
+          </div>
+          <div class="arrows">
+            <button class="arrow-btn" id="trend-prev" type="button" aria-label="Previous homes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="arrow-btn" id="trend-next" type="button" aria-label="Next homes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="track" id="trending-track" tabindex="0" aria-label="Trending homes"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">H</span>
+        <span>HomeStretch</span>
+      </a>
+      <ul class="footer-links">
+        <li><a href="#">About us</a></li>
+        <li><a href="#">Terms and conditions</a></li>
+        <li><a href="#">Privacy policy</a></li>
+        <li><a href="#">How it works</a></li>
+        <li><a href="#">Contact us</a></li>
+      </ul>
+      <p class="footer-copy">&copy; 2026 HomeStretch Real Estate. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
