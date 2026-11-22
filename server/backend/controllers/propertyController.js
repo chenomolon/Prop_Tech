@@ -1,5 +1,19 @@
 const supabase = require('../config/supabase');
 
+const ALLOWED_PROPERTY_TYPES = [
+    'villa',
+    'apartment',
+    'townhouse',
+    'loft',
+    'maisonette',
+    'bungalow'
+]
+
+// Helper prevent image url from receiving a video
+function isVideoUrk(url) {
+    return typeof url === 'string' && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+}
+
 // GET all available properties (with optional filters for Member 2's Catalog)
 const getAllProperties = async (req, res) => {
     try {
@@ -112,38 +126,99 @@ const createProperty = async (req, res) => {
             return res.status(403).json({ error: 'Only developers can post properties.' });
         }
 
-        const { title, description, price, completion_percentage, location, options } = req.body;
+        const { title, description, price, completion_percentage, location, property_type, image_url, media_urls, options } = req.body;
 
-        // 1. Insert the property
+        // 1. Validate required fields & types
+        if (!title || typeof title !== 'string' || !title.trim()) {
+            return res.status(400).json({ error: 'Property title is required.' });
+        }
+        if (!location || typeof location !== 'string' || !location.trim()) {
+            return res.status(400).json({ error: 'Property location is required.' });
+        }
+
+        const numericPrice = Number(price);
+        if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+            return res.status(400).json({ error: 'Price must be a positive number.' });
+        }
+
+        const completionNum = Number(completion_percentage);
+        if (!Number.isInteger(completionNum) || completionNum < 0 || completionNum > 100) {
+            return res.status(400).json({
+                error: 'completion_percentage must be an integer between 0 and 100.'
+            });
+        }
+
+        // Normalize and validate property_type
+        const normalizedType = typeof property_type === 'string'
+            ? property_type.trim().toLowerCase()
+            : 'apartment';
+        if (!ALLOWED_PROPERTY_TYPES.includes(normalizedType)) {
+            return res.status(400).json({
+                error: `Invalid property_type. Allowed values: ${ALLOWED_PROPERTY_TYPES.join(', ')}`
+            });
+        }
+
+        // 2. Sanitize media_urls (keep only valid non-empty strings)
+        const cleanMediaUrls = Array.isArray(media_urls)
+            ? media_urls
+                .filter(url => typeof url === 'string' && url.trim().length > 0)
+                .map(url => url.trim())
+            : [];
+
+        // 3. Determine safe cover image_url (never allow a video file in image_url)
+        let coverImage = '';
+        if (typeof image_url === 'string' && image_url.trim().length > 0) {
+            if (isVideoUrl(image_url.trim())) {
+                return res.status(400).json({
+                    error: 'image_url cannot be a video file. Use media_urls for videos.'
+                });
+            }
+            coverImage = image_url.trim();
+        } else if (cleanMediaUrls.length > 0) {
+            const firstImage = cleanMediaUrls.find(url => !isVideoUrl(url));
+            if (firstImage) coverImage = firstImage;
+        }
+
+        // Ensure coverImage is also present in media_urls if provided
+        const finalMediaUrls = coverImage && !cleanMediaUrls.includes(coverImage)
+            ? [coverImage, ...cleanMediaUrls]
+            : cleanMediaUrls;
+
+        // 4. Insert the property
         const { data: newProperty, error: propError } = await supabase
             .from('properties')
             .insert([{
                 developer_id: req.user.id,
-                title,
-                description,
-                price,
-                completion_percentage,
-                location
+                title: title.trim(),
+                description: typeof description === 'string' ? description.trim() : '',
+                price: numericPrice,
+                completion_percentage: completionNum,
+                location: location.trim(),
+                property_type: normalizedType,
+                image_url: coverImage,
+                media_urls: finalMediaUrls
             }])
             .select()
             .single();
 
         if (propError) throw propError;
 
-        // 2. Insert customization options if provided
+        // 5. Insert customization options if provided
         if (options && Array.isArray(options) && options.length > 0) {
             const formattedOptions = options.map(opt => ({
                 property_id: newProperty.id,
-                category: opt.category,
-                name: opt.name,
-                price_adjustment: opt.price_adjustment || 0
+                category: String(opt.category).trim(),
+                name: String(opt.name).trim(),
+                price_adjustment: Number(opt.price_adjustment) || 0
             }));
 
-            const { error: optError } = await supabase
-                .from('customization_options')
-                .insert(formattedOptions);
+            if (formattedOptions.length > 0) {
+                const { error: optError } = await supabase
+                    .from('customization_options')
+                    .insert(formattedOptions);
 
-            if (optError) throw optError;
+                if (optError) throw optError;
+            }
         }
 
         res.status(201).json({ 
