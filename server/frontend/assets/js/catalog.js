@@ -1,6 +1,40 @@
 // Property catalog: show cards, search and filter (Member 2)
 // Used by index.html (hero search + trending row) and catalog.html (full list)
 
+/*
+// Gloria unaeza tumia example below to this catalog.js to talk to backend for real property details:
+let properties = [];
+
+async function loadProperties() {
+  try {
+    const response = await fetch('/api/properties');
+    if (!response.ok) throw new Error('Failed to fetch properties');
+    
+    const data = await response.json();
+
+    // Nimemap backend columns to your expected fields
+    properties = data.properties.map(p => ({
+      id: p.id,
+      name: p.title,
+      location: p.location,
+      type: p.property_type || 'apartment',
+      price: Number(p.price),
+      completion: p.completion_percentage,
+      image: p.image_url || ''
+    }));
+
+    // Initialize UI sections once data arrives utachange with your actual functions vile utataka
+    initHomePage();
+    initCatalogPage();
+  } catch (err) {
+    console.error('Error loading properties:', err);
+    if (grid) {
+      grid.innerHTML = `<div class="empty"><p>Unable to load properties right now. Please try again later.</p></div>`;
+    }
+  }
+}
+ */
+
 // ---------- 1. DATA ----------
 // Member 4 can replace this na data ya backend 
 // Keep the same fields: id, name, location, type, price, completion, image
