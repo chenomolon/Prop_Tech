@@ -10,7 +10,7 @@ const ALLOWED_PROPERTY_TYPES = [
 ]
 
 // Helper prevent image url from receiving a video
-function isVideoUrk(url) {
+function isVideoUrl(url) {
     return typeof url === 'string' && /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
 }
 
