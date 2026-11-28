@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="/assets/js/supabaseClient.js"></script>
+        <script>
+            // Vile route ya ku get role ya user inafaa kukaa
+            async function redirectByRole(userId) {
+                const { data: profile, error } = await supabaseClient
+                  .from('profiles')
+                  .select('role')
+                  .eq('id', userId)
+                  .single();
+
+                if (error || !profile) {
+                  window.location.href = '/catalog.html';
+                  return;
+                }
+
+                if (profile.role === 'developer') {
+                   window.location.href = '/developer-dashboard.html';
+                } else {
+                  window.location.href = '/catalog.html';
+                }
+            }
+
+            // SIGN UP
+            document.getElementById('').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('').value.trim();
+                const email = document.getElementById('').value.trim();
+                const password = document.getElementById('').value;
+                const role = document.getElementById('').value;
+
+                const {data, error} = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            role
+                        }
+                    }
+                });
+                if (error) {
+                    showMessage(error.message, true);
+                    return;
+                }
+
+                // Ita depend ka email confirmation itakuwa on or off, if off session active immediately
+                if (data.session && data.user) {
+                    showMessage('Account created! Redirecting ...'); // Unaeza implement loading UI for better UX
+                    await redirectByrole(data.user.id); // Example ya function utatumia ku direct people to pages you want based on their roles
+                } else {
+                    showMessage('Sign-up successful! Check your email to confirm your before logging in');
+                }
+            });
+
+            // LoGIN
+            document.getElementById('').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('').value.trim();
+                const password = document.getElementById('').value;
+
+                const {data, error} = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) {
+                    showMessage(error.message, true);
+                    return;
+                }
+
+                showMessage('Logged in! Redirecting...');
+                await redirectByrole(data.user.id);
+
+                //showMessage ni custom function unaeza i customise ikae vile unataka - It was meant to display messages and error for better UX
+            });
+        </script>
+    </body>
+</html>
